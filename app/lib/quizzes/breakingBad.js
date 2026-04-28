@@ -11,6 +11,9 @@ export const breakingBadQuiz = {
       "10 questions on characters, events, and the catchphrases that built the empire. Some are easy. Some will burn you. Cook carefully.",
     ctaLabel: "START COOKING",
     replayLabel: "COOK AGAIN",
+    accent: "#5ce14e",
+    badge: "Br",
+    badgeLabel: "Breaking Bad",
   },
   questions: QUESTIONS,
   verdictTiers: [

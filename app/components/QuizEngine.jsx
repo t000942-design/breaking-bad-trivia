@@ -4,30 +4,89 @@ import { useState } from "react";
 import StartScreen from "./StartScreen";
 import QuestionCard from "./QuestionCard";
 import EndScreen from "./EndScreen";
+import LoadingScreen from "./LoadingScreen";
 import { playCorrect, playWrong, unlockAudio } from "../lib/audio";
+import { QUIZ_LIST } from "../lib/quizzes";
 
-const STAGE = { START: "start", QUESTION: "question", END: "end" };
+const STAGE = {
+  SELECT: "select",
+  LOADING: "loading",
+  QUESTION: "question",
+  END: "end",
+};
 
-export default function QuizEngine({ quiz }) {
-  const [stage, setStage] = useState(STAGE.START);
+export default function QuizEngine() {
+  const quizzes = QUIZ_LIST;
+  const [stage, setStage] = useState(STAGE.SELECT);
+  const [selectedId, setSelectedId] = useState(null);
+  const [questions, setQuestions] = useState(null);
+  const [loadError, setLoadError] = useState(null);
   const [current, setCurrent] = useState(0);
   const [score, setScore] = useState(0);
   const [picked, setPicked] = useState(null);
 
-  const total = quiz.questions.length;
+  const quiz = quizzes.find((q) => q.id === selectedId);
+  const activeQuestions = questions || (quiz ? quiz.questions : []);
+  const total = activeQuestions.length;
+  const accent = quiz?.intro?.accent;
 
-  const start = () => {
-    unlockAudio();
+  const beginQuiz = (qs) => {
+    setQuestions(qs);
     setCurrent(0);
     setScore(0);
     setPicked(null);
     setStage(STAGE.QUESTION);
   };
 
+  const loadAndStart = async (id) => {
+    const targetQuiz = quizzes.find((q) => q.id === id);
+    if (!targetQuiz) return;
+    setLoadError(null);
+    if (typeof targetQuiz.loadQuestions === "function") {
+      setStage(STAGE.LOADING);
+      try {
+        const fetched = await targetQuiz.loadQuestions();
+        if (!fetched || fetched.length === 0) {
+          throw new Error("No questions returned");
+        }
+        beginQuiz(fetched);
+      } catch (err) {
+        setLoadError(err.message || "Unknown error fetching questions");
+      }
+    } else {
+      beginQuiz(targetQuiz.questions);
+    }
+  };
+
+  const selectQuiz = (id) => {
+    unlockAudio();
+    setSelectedId(id);
+    loadAndStart(id);
+  };
+
+  const retryLoad = () => {
+    if (selectedId) loadAndStart(selectedId);
+  };
+
+  const restartCurrent = () => {
+    if (!selectedId) return;
+    loadAndStart(selectedId);
+  };
+
+  const backToMenu = () => {
+    setSelectedId(null);
+    setQuestions(null);
+    setLoadError(null);
+    setCurrent(0);
+    setScore(0);
+    setPicked(null);
+    setStage(STAGE.SELECT);
+  };
+
   const pick = (i) => {
     if (picked !== null) return;
     setPicked(i);
-    if (i === quiz.questions[current].answer) {
+    if (i === activeQuestions[current].answer) {
       setScore((s) => s + 1);
       playCorrect();
     } else {
@@ -44,24 +103,38 @@ export default function QuizEngine({ quiz }) {
     }
   };
 
-  if (stage === STAGE.START) {
-    return <StartScreen intro={quiz.intro} onStart={start} />;
+  if (stage === STAGE.SELECT) {
+    return <StartScreen quizzes={quizzes} onSelect={selectQuiz} />;
   }
+
+  if (stage === STAGE.LOADING) {
+    return (
+      <LoadingScreen
+        accent={accent}
+        error={loadError}
+        onRetry={loadError ? retryLoad : null}
+        onCancel={loadError ? backToMenu : null}
+      />
+    );
+  }
+
   if (stage === STAGE.END) {
     return (
       <EndScreen
         score={score}
         total={total}
         verdictTiers={quiz.verdictTiers}
-        onRestart={start}
+        onRestart={restartCurrent}
+        onMenu={backToMenu}
         ctaLabel={quiz.intro.replayLabel}
       />
     );
   }
+
   return (
     <QuestionCard
-      key={current}
-      question={quiz.questions[current]}
+      key={`${selectedId}-${current}`}
+      question={activeQuestions[current]}
       index={current}
       total={total}
       score={score}

@@ -1,4 +1,52 @@
 export const SVG = {
+  movies: `<svg viewBox='0 0 600 280' xmlns='http://www.w3.org/2000/svg'>
+    <defs>
+      <radialGradient id='spotlight' cx='50%' cy='50%'>
+        <stop offset='0%' stop-color='#f7d046' stop-opacity='0.35'/>
+        <stop offset='100%' stop-color='#f7d046' stop-opacity='0'/>
+      </radialGradient>
+    </defs>
+    <rect width='600' height='280' fill='#0a0a14'/>
+    <ellipse cx='300' cy='150' rx='280' ry='130' fill='url(#spotlight)'/>
+    <g transform='translate(60,130)'>
+      <circle r='48' fill='#1a1a1a' stroke='#888' stroke-width='2'/>
+      <circle r='40' fill='none' stroke='#444' stroke-width='1'/>
+      <circle r='6' fill='#888'/>
+      <circle cx='-26' cy='0' r='6' fill='none' stroke='#666' stroke-width='1.5'/>
+      <circle cx='26' cy='0' r='6' fill='none' stroke='#666' stroke-width='1.5'/>
+      <circle cx='0' cy='-26' r='6' fill='none' stroke='#666' stroke-width='1.5'/>
+      <circle cx='0' cy='26' r='6' fill='none' stroke='#666' stroke-width='1.5'/>
+      <circle cx='-18' cy='-18' r='4' fill='none' stroke='#555' stroke-width='1'/>
+      <circle cx='18' cy='-18' r='4' fill='none' stroke='#555' stroke-width='1'/>
+      <circle cx='-18' cy='18' r='4' fill='none' stroke='#555' stroke-width='1'/>
+      <circle cx='18' cy='18' r='4' fill='none' stroke='#555' stroke-width='1'/>
+    </g>
+    <g transform='translate(540,130)'>
+      <circle r='48' fill='#1a1a1a' stroke='#888' stroke-width='2'/>
+      <circle r='40' fill='none' stroke='#444' stroke-width='1'/>
+      <circle r='6' fill='#888'/>
+      <circle cx='-26' cy='0' r='6' fill='none' stroke='#666' stroke-width='1.5'/>
+      <circle cx='26' cy='0' r='6' fill='none' stroke='#666' stroke-width='1.5'/>
+      <circle cx='0' cy='-26' r='6' fill='none' stroke='#666' stroke-width='1.5'/>
+      <circle cx='0' cy='26' r='6' fill='none' stroke='#666' stroke-width='1.5'/>
+    </g>
+    <g transform='translate(170,70)'>
+      <polygon points='0,0 260,0 280,32 -20,32' fill='#1a1a1a' stroke='#fff' stroke-width='2'/>
+      <polygon points='8,2 32,2 52,30 28,30' fill='#fff'/>
+      <polygon points='66,2 90,2 110,30 86,30' fill='#fff'/>
+      <polygon points='124,2 148,2 168,30 144,30' fill='#fff'/>
+      <polygon points='182,2 206,2 226,30 202,30' fill='#fff'/>
+      <polygon points='240,2 264,2 280,30 260,30' fill='#fff'/>
+      <rect x='0' y='32' width='260' height='130' fill='#1a1a1a' stroke='#fff' stroke-width='2'/>
+      <text x='130' y='75' text-anchor='middle' font-family='Impact,sans-serif' font-size='28' fill='#f7d046' letter-spacing='3'>SCENE 01</text>
+      <text x='130' y='110' text-anchor='middle' font-family='Impact,sans-serif' font-size='16' fill='#fff' letter-spacing='2'>TAKE 1</text>
+      <line x1='30' y1='125' x2='230' y2='125' stroke='#666' stroke-width='1'/>
+      <text x='130' y='148' text-anchor='middle' font-family='monospace' font-size='10' fill='#aaa'>DIRECTOR ___________</text>
+    </g>
+    <text x='300' y='250' text-anchor='middle' font-family='Impact,sans-serif' font-size='18' fill='#f7d046' letter-spacing='8'>HOLLYWOOD</text>
+    <text x='300' y='268' text-anchor='middle' font-family='monospace' font-size='8' fill='#888' letter-spacing='4'>QUIET ON SET</text>
+  </svg>`,
+
   hero: `<svg viewBox='0 0 600 220' xmlns='http://www.w3.org/2000/svg'>
     <defs>
       <linearGradient id='sky' x1='0' y1='0' x2='0' y2='1'>

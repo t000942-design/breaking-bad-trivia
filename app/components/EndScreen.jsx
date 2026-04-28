@@ -8,7 +8,7 @@ function pickVerdict(score, tiers) {
   return sorted[sorted.length - 1];
 }
 
-export default function EndScreen({ score, total, verdictTiers, onRestart, ctaLabel = "Play Again" }) {
+export default function EndScreen({ score, total, verdictTiers, onRestart, onMenu, ctaLabel = "Play Again" }) {
   const tier = pickVerdict(score, verdictTiers);
 
   return (
@@ -21,9 +21,16 @@ export default function EndScreen({ score, total, verdictTiers, onRestart, ctaLa
         {score} / {total}
       </div>
       <p className="quote">{tier.quote}</p>
-      <button className="restart-btn" onClick={onRestart}>
-        {ctaLabel}
-      </button>
+      <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
+        <button className="restart-btn" onClick={onRestart}>
+          {ctaLabel}
+        </button>
+        {onMenu && (
+          <button className="next-btn" onClick={onMenu} style={{ width: "auto", padding: "12px 24px" }}>
+            ← Choose Another Quiz
+          </button>
+        )}
+      </div>
     </div>
   );
 }

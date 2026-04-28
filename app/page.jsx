@@ -1,10 +1,7 @@
 import QuizEngine from "./components/QuizEngine";
 import FloatingBackground from "./components/FloatingBackground";
-import { getQuiz } from "./lib/quizzes";
 
 export default function Page() {
-  const quiz = getQuiz("breaking-bad");
-
   return (
     <div className="container">
       <FloatingBackground />
@@ -26,7 +23,7 @@ export default function Page() {
       </header>
 
       <main className="panel">
-        <QuizEngine quiz={quiz} />
+        <QuizEngine />
       </main>
 
       <footer>I AM THE ONE WHO KNOCKS</footer>

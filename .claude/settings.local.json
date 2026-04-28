@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(winget --version)",
+      "Bash(choco --version)",
+      "Bash(winget install *)",
+      "Bash(export PATH=\"/c/Program Files/nodejs:$PATH\")",
+      "Bash(npm --version)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(grep -iE '\\\\.\\(jpg|jpeg|png|webp|gif\\)$')",
+      "Bash(ipconfig)",
+      "Bash(taskkill //F //IM node.exe)",
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(curl -s \"http://localhost:3000/_next/static/css/app/layout.css\")",
+      "Bash(ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N \"\" -C \"LENOVO@$\\(hostname\\)\")",
+      "Bash(rm ~/.ssh/id_ed25519 ~/.ssh/id_ed25519.pub)",
+      "Bash(ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N \"\" -C \"t000942@coded.edu.kw\")",
+      "Bash(gh --version)",
+      "Bash(gh auth *)",
+      "Bash(git --version)",
+      "Bash(git config *)",
+      "Bash(git init *)",
+      "Bash(git add *)"
+    ]
+  }
+}

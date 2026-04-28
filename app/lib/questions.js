@@ -1,0 +1,92 @@
+import { SVG } from "./svgs";
+
+export const QUESTIONS = [
+  {
+    q: "What is the name of the high school chemistry teacher at the center of the show?",
+    options: ["Walter White", "Walter Black", "William White", "Wesley Wood"],
+    answer: 0,
+    category: "Characters",
+    image: "/images/q1-walter.jpg",
+    imageType: "url",
+  },
+  {
+    q: "How does Jesse Pinkman almost always address Walter White throughout the series?",
+    options: ["Heisenberg", "Mr. White", "Teach", "Walt"],
+    answer: 1,
+    category: "Characters",
+    image: "/images/q2-jesse.png",
+    imageType: "url",
+  },
+  {
+    q: "How pure is Heisenberg's signature blue meth, according to the DEA's lab analysis?",
+    options: ["92.5%", "96.2%", "99.1%", "99.9%"],
+    answer: 2,
+    category: "Events",
+    image: SVG.purityReport,
+  },
+  {
+    q: "Walter's drug-world alias references a German physicist most famous for which principle?",
+    options: [
+      "Theory of Relativity",
+      "Uncertainty Principle",
+      "Conservation of Energy",
+      "Quantum Entanglement",
+    ],
+    answer: 1,
+    category: "Characters",
+    image: "/images/q4-uncertainty.png",
+    imageType: "url",
+  },
+  {
+    q: 'What does Hank Schrader famously correct his wife about — "They\'re not rocks, they\'re ___!"',
+    options: ["Crystals", "Stones", "Minerals", "Gemstones"],
+    answer: 2,
+    category: "Catchphrases",
+    image: SVG.minerals,
+  },
+  {
+    q: "Apart from Los Pollos Hermanos, what front business of Gus Fring's hides his super-lab?",
+    options: [
+      "An auto body shop",
+      "An industrial laundry",
+      "A car wash",
+      "A bus depot",
+    ],
+    answer: 1,
+    category: "Events",
+    image: SVG.laundromat,
+  },
+  {
+    q: "Who personally triggers the bomb that kills Gus Fring?",
+    options: [
+      "Walter White",
+      "Hector Salamanca",
+      "Mike Ehrmantraut",
+      "Jesse Pinkman",
+    ],
+    answer: 1,
+    category: "Events",
+    image: SVG.tombstone,
+  },
+  {
+    q: 'Whom is Walter speaking to when he delivers his famous "I am the one who knocks" monologue?',
+    options: ["Jesse", "Skyler", "Hank", "Gus"],
+    answer: 1,
+    category: "Catchphrases",
+    image: SVG.knock,
+  },
+  {
+    q: "What is Saul Goodman's real birth name (revealed across the franchise)?",
+    options: ["James Mitchell", "Jimmy McGill", "Saul Goldstein", "Charles McGill"],
+    answer: 1,
+    category: "Characters",
+    image: SVG.businessCard,
+  },
+  {
+    q: "What does Walt secretly poison Brock with to manipulate Jesse against Gus?",
+    options: ["Ricin", "Lily of the Valley", "Cyanide", "Anthrax"],
+    answer: 1,
+    category: "Events",
+    image: SVG.hospital,
+  },
+];

@@ -63,6 +63,34 @@ html, body {
   animation-name: float-drift-alt;
 }
 
+/* Movie-themed floaters: hidden by default, revealed only in movies mode */
+.float-el.float-movie {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.float-el.float-movie svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 8px rgba(247, 208, 70, 0.5));
+}
+
+.float-el.float-clapper {
+  animation-name: float-drift-alt;
+}
+
+body.quiz-movies-active .float-el.float-movie {
+  opacity: 0.7;
+}
+
 @keyframes float-drift {
   0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
   25%  { transform: translate3d(8px, -22px, 0) rotate(4deg); }
@@ -207,6 +235,19 @@ body.cover-active footer {
 
 button, .option, .start-btn, .restart-btn {
   cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='44' height='52' viewBox='0 0 40 48'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0%' stop-color='%23f7d046' stop-opacity='0.95'/><stop offset='100%' stop-color='%23c0392b' stop-opacity='0.95'/></linearGradient></defs><path d='M14 4 L14 16 L4 38 Q4 44 12 44 L28 44 Q36 44 36 38 L26 16 L26 4 Z' fill='url(%23g)' stroke='%23ffcc00' stroke-width='2'/><rect x='12' y='2' width='16' height='4' fill='%23333' stroke='%23ffcc00' stroke-width='1'/><circle cx='14' cy='34' r='2' fill='%23ffffff' opacity='0.8'/><circle cx='22' cy='38' r='1.5' fill='%23ffffff' opacity='0.7'/></svg>") 14 4, pointer;
+}
+
+/* === Movies-mode cursor: clapperboard === */
+body.quiz-movies-active {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'><rect x='4' y='10' width='32' height='6' fill='%23000' stroke='%23ffffff' stroke-width='1.2'/><polygon points='6,10 12,10 14,16 8,16' fill='%23ffffff'/><polygon points='15,10 21,10 23,16 17,16' fill='%23ffffff'/><polygon points='24,10 30,10 32,16 26,16' fill='%23ffffff'/><rect x='4' y='16' width='32' height='20' fill='%231a1a1a' stroke='%23ffffff' stroke-width='1.2'/><text x='20' y='28' text-anchor='middle' fill='%23f7d046' font-size='6' font-family='Arial' font-weight='bold'>SCENE</text></svg>") 8 6, auto;
+}
+
+body.quiz-movies-active button,
+body.quiz-movies-active .option,
+body.quiz-movies-active .start-btn,
+body.quiz-movies-active .restart-btn,
+body.quiz-movies-active .quiz-tile {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 40 40'><rect x='4' y='10' width='32' height='6' fill='%23c0392b' stroke='%23ffd54a' stroke-width='1.2'/><polygon points='6,10 12,10 14,16 8,16' fill='%23ffd54a'/><polygon points='15,10 21,10 23,16 17,16' fill='%23ffd54a'/><polygon points='24,10 30,10 32,16 26,16' fill='%23ffd54a'/><rect x='4' y='16' width='32' height='20' fill='%23222222' stroke='%23ffd54a' stroke-width='1.2'/><text x='20' y='28' text-anchor='middle' fill='%23ffffff' font-size='6' font-family='Arial' font-weight='bold'>ACTION</text></svg>") 10 6, pointer;
 }
 
 .container {

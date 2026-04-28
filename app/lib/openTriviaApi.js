@@ -6,10 +6,16 @@
  *
  * The API returns HTML-encoded text and provides correct/incorrect answers
  * separately, so we decode entities and shuffle the options client-side.
+ *
+ * IMPORTANT: OpenTDB enforces a strict 5s-between-requests rate limit per IP
+ * and returns HTTP 429 if you exceed it. We make a SINGLE request for 10
+ * mixed-difficulty questions and sort them client-side (easy → medium → hard)
+ * to preserve the difficulty ramp without ever risking 429.
  */
 
 const API_BASE = "https://opentdb.com/api.php";
 const CATEGORY_FILM = 11;
+const DIFFICULTY_ORDER = { easy: 0, medium: 1, hard: 2 };
 
 const HTML_ENTITIES = {
   "&quot;": '"',
@@ -48,7 +54,6 @@ function decodeHtml(html) {
   for (const [entity, char] of Object.entries(HTML_ENTITIES)) {
     out = out.split(entity).join(char);
   }
-  // Numeric entities like &#39;
   out = out.replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)));
   return out;
 }
@@ -79,55 +84,57 @@ function mapApiQuestion(apiQ, defaultImage) {
   };
 }
 
-async function fetchByDifficulty(amount, difficulty) {
+const RESPONSE_CODE_MESSAGES = {
+  1: "No questions returned for this category",
+  2: "Invalid request parameters",
+  3: "Session token not found",
+  4: "Session token has returned all available questions",
+  5: "Rate limited by OpenTDB — wait 5 seconds and try again",
+};
+
+/**
+ * Fetch 10 movie-trivia questions and order them easy → medium → hard.
+ *
+ * Single API call (no rate-limit risk). The server returns a mix of
+ * difficulties; we sort client-side to preserve the progression effect.
+ *
+ * @param {Object} [opts]
+ * @param {string} [opts.defaultImage] - image attached to each question
+ */
+export async function fetchMoviesQuestions(opts = {}) {
+  const { defaultImage } = opts;
   const params = new URLSearchParams({
-    amount: String(amount),
+    amount: "10",
     category: String(CATEGORY_FILM),
-    difficulty,
     type: "multiple",
     encode: "default",
   });
   const url = `${API_BASE}?${params.toString()}`;
+
   const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) throw new Error(`OpenTDB HTTP ${res.status}`);
+
+  if (res.status === 429) {
+    throw new Error(
+      "OpenTDB rate limited us (HTTP 429). Wait ~5 seconds, then click Try Again."
+    );
+  }
+  if (!res.ok) {
+    throw new Error(`OpenTDB HTTP ${res.status}`);
+  }
+
   const data = await res.json();
-  // response_code: 0 success, 1 no results, 2 invalid param, 3 token not found, 4 token empty, 5 rate limit
   if (data.response_code !== 0) {
-    const msg =
-      {
-        1: "No questions returned for this difficulty",
-        2: "Invalid request parameters",
-        5: "Rate limited by OpenTDB — wait a few seconds and try again",
-      }[data.response_code] || `OpenTDB error code ${data.response_code}`;
-    throw new Error(msg);
+    throw new Error(
+      RESPONSE_CODE_MESSAGES[data.response_code] ||
+        `OpenTDB error code ${data.response_code}`
+    );
   }
-  return data.results;
-}
 
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const sorted = [...data.results].sort(
+    (a, b) =>
+      (DIFFICULTY_ORDER[a.difficulty] ?? 99) -
+      (DIFFICULTY_ORDER[b.difficulty] ?? 99)
+  );
 
-/**
- * Fetch 10 movie-trivia questions ramping easy → medium → hard.
- * Sequenced (with a 600ms gap) to play nice with OpenTDB's 1-req-per-5s limit
- * — three quick calls is well under the threshold but the gap helps if the
- * user retries quickly.
- *
- * @param {Object} [opts]
- * @param {string} [opts.defaultImage] - image to attach to each question
- */
-export async function fetchMoviesQuestions(opts = {}) {
-  const { defaultImage } = opts;
-  const tiers = [
-    { difficulty: "easy",   amount: 3 },
-    { difficulty: "medium", amount: 4 },
-    { difficulty: "hard",   amount: 3 },
-  ];
-  const all = [];
-  for (let i = 0; i < tiers.length; i++) {
-    const { difficulty, amount } = tiers[i];
-    const batch = await fetchByDifficulty(amount, difficulty);
-    all.push(...batch);
-    if (i < tiers.length - 1) await sleep(600);
-  }
-  return all.map((q) => mapApiQuestion(q, defaultImage));
+  return sorted.map((q) => mapApiQuestion(q, defaultImage));
 }

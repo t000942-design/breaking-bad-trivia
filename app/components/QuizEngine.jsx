@@ -1,12 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import StartScreen from "./StartScreen";
 import QuestionCard from "./QuestionCard";
 import EndScreen from "./EndScreen";
 import LoadingScreen from "./LoadingScreen";
 import { playCorrect, playWrong, unlockAudio } from "../lib/audio";
 import { QUIZ_LIST } from "../lib/quizzes";
+
+const QUIZ_BODY_CLASSES = {
+  "breaking-bad": "quiz-breaking-bad-active",
+  "general-movies": "quiz-movies-active",
+};
 
 const STAGE = {
   SELECT: "select",
@@ -17,6 +22,16 @@ const STAGE = {
 
 export default function QuizEngine() {
   const quizzes = QUIZ_LIST;
+
+  // Toggle a body class for the active quiz so CSS can theme cursor and
+  // background floaters per-genre. Cleaned up on unmount or selection reset.
+  useEffect(() => {
+    return () => {
+      Object.values(QUIZ_BODY_CLASSES).forEach((c) =>
+        document.body.classList.remove(c)
+      );
+    };
+  }, []);
   const [stage, setStage] = useState(STAGE.SELECT);
   const [selectedId, setSelectedId] = useState(null);
   const [questions, setQuestions] = useState(null);
@@ -61,6 +76,13 @@ export default function QuizEngine() {
   const selectQuiz = (id) => {
     unlockAudio();
     setSelectedId(id);
+    // Apply the genre-specific body class (cursor + background theme).
+    Object.values(QUIZ_BODY_CLASSES).forEach((c) =>
+      document.body.classList.remove(c)
+    );
+    if (QUIZ_BODY_CLASSES[id]) {
+      document.body.classList.add(QUIZ_BODY_CLASSES[id]);
+    }
     loadAndStart(id);
   };
 
@@ -81,6 +103,9 @@ export default function QuizEngine() {
     setScore(0);
     setPicked(null);
     setStage(STAGE.SELECT);
+    Object.values(QUIZ_BODY_CLASSES).forEach((c) =>
+      document.body.classList.remove(c)
+    );
   };
 
   const pick = (i) => {

@@ -1,20 +1,18 @@
 /**
- * OpenTDB API client (https://opentdb.com)
+ * Client for our Next.js /api/movies-questions route, which proxies OpenTDB.
  *
- * Fetches multiple-choice trivia questions and converts them to the internal
- * question shape used by QuizEngine: { q, options, answer, category, image, imageType }.
+ * Why a server route?
+ *  - Avoids browser CORS quirks
+ *  - Lets us return clean error envelopes ({ error, response_code })
+ *  - Keeps the upstream URL out of the client bundle
  *
- * The API returns HTML-encoded text and provides correct/incorrect answers
- * separately, so we decode entities and shuffle the options client-side.
+ * The route returns the raw OpenTDB shape on success:
+ *   { response_code: 0, results: [{ question, correct_answer, ... }] }
  *
- * IMPORTANT: OpenTDB enforces a strict 5s-between-requests rate limit per IP
- * and returns HTTP 429 if you exceed it. We make a SINGLE request for 10
- * mixed-difficulty questions and sort them client-side (easy → medium → hard)
- * to preserve the difficulty ramp without ever risking 429.
+ * We decode HTML entities, shuffle answers, and sort easy → medium → hard.
  */
 
-const API_BASE = "https://opentdb.com/api.php";
-const CATEGORY_FILM = 11;
+const ENDPOINT = "/api/movies-questions";
 const DIFFICULTY_ORDER = { easy: 0, medium: 1, hard: 2 };
 
 const HTML_ENTITIES = {
@@ -84,50 +82,32 @@ function mapApiQuestion(apiQ, defaultImage) {
   };
 }
 
-const RESPONSE_CODE_MESSAGES = {
-  1: "No questions returned for this category",
-  2: "Invalid request parameters",
-  3: "Session token not found",
-  4: "Session token has returned all available questions",
-  5: "Rate limited by OpenTDB — wait 5 seconds and try again",
-};
-
 /**
- * Fetch 10 movie-trivia questions and order them easy → medium → hard.
- *
- * Single API call (no rate-limit risk). The server returns a mix of
- * difficulties; we sort client-side to preserve the progression effect.
+ * Fetch 10 movie-trivia questions via our Next.js server route.
+ * Single upstream call (no rate-limit risk). Sorted easy → medium → hard.
  *
  * @param {Object} [opts]
  * @param {string} [opts.defaultImage] - image attached to each question
  */
 export async function fetchMoviesQuestions(opts = {}) {
   const { defaultImage } = opts;
-  const params = new URLSearchParams({
-    amount: "10",
-    category: String(CATEGORY_FILM),
-    type: "multiple",
-    encode: "default",
-  });
-  const url = `${API_BASE}?${params.toString()}`;
+  const res = await fetch(`${ENDPOINT}?amount=10`, { cache: "no-store" });
 
-  const res = await fetch(url, { cache: "no-store" });
-
-  if (res.status === 429) {
-    throw new Error(
-      "OpenTDB rate limited us (HTTP 429). Wait ~5 seconds, then click Try Again."
-    );
-  }
   if (!res.ok) {
-    throw new Error(`OpenTDB HTTP ${res.status}`);
+    let body = null;
+    try {
+      body = await res.json();
+    } catch {
+      // ignore
+    }
+    throw new Error(
+      (body && body.error) || `Server route returned HTTP ${res.status}`
+    );
   }
 
   const data = await res.json();
-  if (data.response_code !== 0) {
-    throw new Error(
-      RESPONSE_CODE_MESSAGES[data.response_code] ||
-        `OpenTDB error code ${data.response_code}`
-    );
+  if (!data.results || !Array.isArray(data.results)) {
+    throw new Error("Server route returned unexpected payload");
   }
 
   const sorted = [...data.results].sort(

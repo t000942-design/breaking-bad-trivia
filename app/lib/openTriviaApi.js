@@ -10,7 +10,12 @@
  *   { response_code: 0, results: [{ question, correct_answer, ... }] }
  *
  * We decode HTML entities, shuffle answers, and sort easy → medium → hard.
+ * Each question is also given a topic-based illustration (director chair,
+ * Oscar trophy, music note, etc.) that hints at the question type without
+ * revealing the answer.
  */
+
+import { getMovieTopicSvg } from "./movieTopicIcons";
 
 const ENDPOINT = "/api/movies-questions";
 const DIFFICULTY_ORDER = { easy: 0, medium: 1, hard: 2 };
@@ -72,13 +77,17 @@ function mapApiQuestion(apiQ, defaultImage) {
   const answer = options.indexOf(correct);
   const difficulty =
     apiQ.difficulty.charAt(0).toUpperCase() + apiQ.difficulty.slice(1);
+  const decodedQ = decodeHtml(apiQ.question);
+  // Pick a topic-based illustration that hints at the category without
+  // revealing the answer. Falls back to defaultImage if none provided.
+  const topicSvg = getMovieTopicSvg(decodedQ) || defaultImage;
   return {
-    q: decodeHtml(apiQ.question),
+    q: decodedQ,
     options,
     answer,
     category: difficulty,
-    image: defaultImage,
-    imageType: defaultImage && defaultImage.startsWith("/") ? "url" : "svg",
+    image: topicSvg,
+    imageType: typeof topicSvg === "string" && topicSvg.startsWith("/") ? "url" : "svg",
   };
 }
 
